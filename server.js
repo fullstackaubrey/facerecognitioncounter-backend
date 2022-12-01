@@ -9,17 +9,17 @@ const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
+
 const postgresdB = require('knex')({
         client: 'pg',
         connection: {
-      host : '127.0.0.1',
-      user : 'postgres',
-      password : 'postgres2022',
-      database : 'faceRecognitionBrain'
+      connectionString: process.env.DATABASE_URL,
+      ssl: true
     }
   });
 
-const app = express();
+const app = express(cors());
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -35,10 +35,6 @@ app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, postg
 app.put('/image', (req, res) => { image.handleImage(req, res, postgresdB)})
 app.post('/imageurl', (req, res) => { image.handleApiCall(req,res)})
 
-const PORT = process.env.PORT
-app.listen(PORT, () => {
-    console.log(`App is running on port ${PORT}`);
+app.listen(process.env.PORT || 3000, ()=> {
+  console.log(`Server is running on ${process.env.PORT}`);
 })
-
-console.log(PORT)
-
